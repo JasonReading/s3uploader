@@ -73,7 +73,7 @@ try {
                 $trimmedAwsFolder = trim($config['aws']['folder'], '/');
                 $s3FileLocation = sprintf('s3://%s/%s/%s', $config['aws']['bucket'], $trimmedAwsFolder, $trimmedLocalFile);
                 echo str_repeat('/', 80) . "\n";
-                echo $trimmedLocalFile . "\n";
+                echo $localFileLocation . "\n";
                 echo $s3FileLocation . "\n";
 
                 if (!file_exists($localFileLocation)) {
