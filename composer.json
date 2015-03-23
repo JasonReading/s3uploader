@@ -1,6 +1,7 @@
 {
   "require": {
     "aws/aws-sdk-php" : "~2.7",
-    "symfony/yaml": "~2.6"
+    "symfony/yaml": "~2.6",
+    "ramsey/array_column": "~1.1"
   }
 }
