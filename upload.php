@@ -112,6 +112,7 @@ try {
                     'Bucket' => $config['aws']['bucket'],
                     'Key' => $s3FileLocation,
                 ]);
+                echo "...";
 
                 // Check S3 for file
                 if (!file_exists($s3Url)) {
@@ -120,7 +121,7 @@ try {
                     echo " - Uploaded file not found\n";
                     continue;
                 }
-                echo "!";
+                echo "!\n";
                 $doneFiles[] = $file;
             } catch (Exception $e) {
                 $failedFiles[] = $file;
@@ -144,8 +145,8 @@ try {
         if (count($folderFiles)) {
             $folderFileIds = array_column($folderFiles, 'id');
             $placeholders = rtrim(str_repeat('?, ', count($folderFileIds)), ', ');
-            $updateStatement = $pdo->prepare("update _import set processed = ? where id in ($placeholders);");
-            $updateStatement->execute(array_merge([FOLDER], $failedFileIds));
+            $updateStatement = $pdo->prepare("update _import set processed = ?, folder = ? where id in ($placeholders);");
+            $updateStatement->execute(array_merge([FOLDER, 1], $failedFileIds));
         }
     }
 } catch (Exception $e) {
