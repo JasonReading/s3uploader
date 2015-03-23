@@ -30,9 +30,11 @@ $context = stream_context_create([
 ]);
 
 // Connect to database
-$pdo = new PDO($config['database']['host'], $config['database']['username'], $config['database']['password'], $config['database']['database']);
-if ($pdo->errorCode()) {
-    printf("Connect failed: %s\n", $pdo->errorInfo());
+try {
+    $pdo = new PDO($config['database']['host'], $config['database']['username'], $config['database']['password'], $config['database']['database']);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo 'Connection failed: ' . $e->getMessage();
     exit(1);
 }
 $hasRows = true;
