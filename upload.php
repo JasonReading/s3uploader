@@ -146,7 +146,7 @@ try {
             $folderFileIds = array_column($folderFiles, 'id');
             $placeholders = rtrim(str_repeat('?, ', count($folderFileIds)), ', ');
             $updateStatement = $pdo->prepare("update _import set processed = ?, folder = ? where id in ($placeholders);");
-            $updateStatement->execute(array_merge([FOLDER, 1], $failedFileIds));
+            $updateStatement->execute(array_merge([FOLDER, 1], $folderFileIds));
         }
     }
 } catch (Exception $e) {
