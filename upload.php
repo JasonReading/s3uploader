@@ -72,7 +72,8 @@ try {
                 $trimmedLocalFile = str_replace('./', '', $trimmedLocalFile);
                 $localFileLocation = sprintf('%s/%s', $trimmedContentRoot, $trimmedLocalFile);
                 $trimmedAwsFolder = trim($config['aws']['folder'], '/');
-                $s3FileLocation = sprintf('s3://%s/%s/%s', $config['aws']['bucket'], $trimmedAwsFolder, $trimmedLocalFile);
+                $s3FileLocation = sprintf('%s/%s', $trimmedAwsFolder, $trimmedLocalFile);
+                $s3Url = sprintf('s3://%s/%s', $config['aws']['bucket'], $s3FileLocation);
                 echo str_repeat('/', 80) . "\n";
                 echo $localFileLocation . "\n";
                 echo $s3FileLocation . "\n";
@@ -90,7 +91,7 @@ try {
                 echo "...";
 
                 // Check S3 for file
-                if (file_exists($s3FileLocation)) {
+                if (file_exists($s3Url)) {
                     // File already exists
                     $failedFiles[] = $file; // We can check these later - mark as failed
                     echo " - S3 file already exists\n";
@@ -98,15 +99,22 @@ try {
                 }
                 echo "...";
                 // Upload file to S3
-                $s3File = new SplFileObject($s3FileLocation, 'w', null, $context);
-                $localFile = new SplFileObject($localFileLocation, 'r');
-                while (!$localFile->eof()) {
-                    $s3File->fwrite($localFile->fgets());
-                }
+                $s3->putObject([
+                    'ACL' => 'public-read',
+                    'Bucket' => $config['aws']['bucket'],
+                    'Key' => $s3FileLocation,
+                    'SourceFile' => $localFileLocation,
+                ]);
                 echo "...";
 
+                // Check S3 file uploaded
+                $s3->waitUntil('ObjectExists', [
+                    'Bucket' => $config['aws']['bucket'],
+                    'Key' => $s3FileLocation,
+                ]);
+
                 // Check S3 for file
-                if (!file_exists($s3FileLocation)) {
+                if (!file_exists($s3Url)) {
                     // File already exists
                     $failedFiles[] = $file; // We can check these later - mark as failed
                     echo " - Uploaded file not found\n";
