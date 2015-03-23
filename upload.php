@@ -5,11 +5,11 @@ use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
 use Symfony\Component\Yaml\Parser;
 
+define('FOLDER', -2);
 define('FAILED', -1);
 define('PENDING', 0);
 define('PROCESSING', 1);
 define('DONE', 2);
-
 
 echo "Works Importer v0.2\n";
 $yaml = new Parser();
@@ -63,6 +63,7 @@ try {
 
         $failedFiles = [];
         $doneFiles = [];
+        $folderFiles = [];
         foreach ($allFiles as $file) {
             try {
                 // Check local hard drive for file
@@ -79,6 +80,11 @@ try {
                 if (!file_exists($localFileLocation)) {
                     $failedFiles[] = $file;
                     echo " - Local file doesn't exist\n";
+                    continue;
+                }
+                if (is_dir($localFileLocation)) {
+                    $folderFiles[] = $file;
+                    echo " - Local file is a folder\n";
                     continue;
                 }
                 echo "...";
@@ -115,14 +121,24 @@ try {
         }
 
         // Mark objects as "processed" / "failed"
-        $doneFileIds = array_column($doneFiles, 'id');
-        $placeholders = rtrim(str_repeat('?, ', count($doneFileIds)), ', ');
-        $updateStatement = $pdo->prepare("update _import set processed = ? where id in ($placeholders);");
-        $updateStatement->execute(array_merge([DONE], $doneFileIds));
-        $failedFileIds = array_column($failedFiles, 'id');
-        $placeholders = rtrim(str_repeat('?, ', count($failedFileIds)), ', ');
-        $updateStatement = $pdo->prepare("update _import set processed = ? where id in ($placeholders);");
-        $updateStatement->execute(array_merge([FAILED], $failedFileIds));
+        if (count($doneFiles)) {
+            $doneFileIds = array_column($doneFiles, 'id');
+            $placeholders = rtrim(str_repeat('?, ', count($doneFileIds)), ', ');
+            $updateStatement = $pdo->prepare("update _import set processed = ? where id in ($placeholders);");
+            $updateStatement->execute(array_merge([DONE], $doneFileIds));
+        }
+        if (count($failedFiles)) {
+            $failedFileIds = array_column($failedFiles, 'id');
+            $placeholders = rtrim(str_repeat('?, ', count($failedFileIds)), ', ');
+            $updateStatement = $pdo->prepare("update _import set processed = ? where id in ($placeholders);");
+            $updateStatement->execute(array_merge([FAILED], $failedFileIds));
+        }
+        if (count($folderFiles)) {
+            $folderFileIds = array_column($folderFiles, 'id');
+            $placeholders = rtrim(str_repeat('?, ', count($folderFileIds)), ', ');
+            $updateStatement = $pdo->prepare("update _import set processed = ? where id in ($placeholders);");
+            $updateStatement->execute(array_merge([FOLDER], $failedFileIds));
+        }
     }
 } catch (Exception $e) {
     // TODO: Handle exceptions?
