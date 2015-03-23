@@ -68,6 +68,7 @@ try {
                 // Check local hard drive for file
                 $trimmedContentRoot = rtrim($config['content_root'], '/');
                 $trimmedLocalFile = trim($file['local'], '/');
+                $trimmedLocalFile = str_replace('./', '', $trimmedLocalFile);
                 $localFileLocation = sprintf('%s/%s', $trimmedContentRoot, $trimmedLocalFile);
                 $trimmedAwsFolder = trim($config['aws']['folder'], '/');
                 $s3FileLocation = sprintf('s3://%s/%s/%s', $config['aws']['bucket'], $trimmedAwsFolder, $trimmedLocalFile);
