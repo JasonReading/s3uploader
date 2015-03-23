@@ -68,34 +68,43 @@ try {
                 $trimmedContentRoot = rtrim($config['content_root'], '/');
                 $trimmedLocalFile = trim($file['local'], '/');
                 $localFileLocation = sprintf('%s/%s', $trimmedContentRoot, $trimmedLocalFile);
-                if (!file_exists($localFileLocation)) {
-                    $failedFiles[] = $file;
-                    continue;
-                }
-
-                // Check S3 for file
                 $trimmedAwsFolder = trim($config['aws']['folder'], '/');
                 $s3FileLocation = sprintf('s3://%s/%s/%s', $config['aws']['bucket'], $trimmedAwsFolder, $trimmedLocalFile);
+                echo str_repeat('/', 80) . "\n";
+                echo $trimmedLocalFile . "\n";
+                echo $s3FileLocation . "\n";
+
+                if (!file_exists($localFileLocation)) {
+                    $failedFiles[] = $file;
+                    echo " - Local file doesn't exist\n";
+                    continue;
+                }
+                echo "...";
+
+                // Check S3 for file
                 if (file_exists($s3FileLocation)) {
                     // File already exists
                     $failedFiles[] = $file; // We can check these later - mark as failed
+                    echo " - S3 file already exists\n";
                     continue;
                 }
-
+                echo "...";
                 // Upload file to S3
                 $s3File = new SplFileObject($s3FileLocation, 'w', null, $context);
                 $localFile = new SplFileObject($localFileLocation, 'r');
                 while (!$localFile->eof()) {
                     $s3File->fwrite($localFile->fgets());
                 }
+                echo "...";
 
                 // Check S3 for file
                 if (!file_exists($s3FileLocation)) {
                     // File already exists
                     $failedFiles[] = $file; // We can check these later - mark as failed
+                    echo " - Uploaded file not found\n";
                     continue;
                 }
-
+                echo "!";
                 $doneFiles[] = $file;
             } catch (Exception $e) {
                 $failedFiles[] = $file;
