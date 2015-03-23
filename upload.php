@@ -42,7 +42,7 @@ $hasRows = true;
 try {
     while($hasRows) {
         // Load all objects to process
-        $statement = $pdo->prepare("select * from _import where processed = :processed and content = 1 limit :limit;");
+        $statement = $pdo->prepare("select * from _import where processed = :processed and content = 1 order by rand() limit :limit;");
         $pending = PENDING;
         $statement->bindParam(':processed', $pending, PDO::PARAM_INT);
         $statement->bindParam(':limit', $config['chunk'], PDO::PARAM_INT);
