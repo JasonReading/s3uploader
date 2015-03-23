@@ -4,6 +4,7 @@ aws:
   folder: "/aws-folder/"
   secret: "aws_secret"
   key: "aws_key"
+  region: eu-west-1
 chunk: 100
 database:
   host: mysql:host=localhost;dbname=dbname

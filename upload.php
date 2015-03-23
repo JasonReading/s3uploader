@@ -25,6 +25,7 @@ $s3 = S3Client::factory([
 $s3->registerStreamWrapper();
 $context = stream_context_create([
     's3' => [
+        'region' => $config['aws']['region'],
         'ACL' => 'public-read'
     ]
 ]);
