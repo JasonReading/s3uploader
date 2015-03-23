@@ -150,5 +150,5 @@ try {
         }
     }
 } catch (Exception $e) {
-    // TODO: Handle exceptions?
+    echo  "\n" . $e->getMessage() . "\n\n";
 }
