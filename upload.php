@@ -17,6 +17,7 @@ $config = $yaml->parse(file_get_contents('settings.yml'));
 
 // Load S3 connection
 $s3 = S3Client::factory([
+    'region' => $config['aws']['region'],
     'credentials' => [
         'key' => $config['aws']['key'],
         'secret' => $config['aws']['secret'],
@@ -25,7 +26,6 @@ $s3 = S3Client::factory([
 $s3->registerStreamWrapper();
 $context = stream_context_create([
     's3' => [
-        'region' => $config['aws']['region'],
         'ACL' => 'public-read'
     ]
 ]);
