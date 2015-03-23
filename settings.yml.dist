@@ -1,0 +1,12 @@
+content_root: /location/collection_1/files/
+aws:
+  bucket: "aws-bucket-name"
+  folder: "/aws-folder/"
+  secret: "aws_secret"
+  key: "aws_key"
+chunk: 100
+database:
+  host: localhost
+  database: db
+  username: user
+  password: passwd
