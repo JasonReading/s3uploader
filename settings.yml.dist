@@ -6,7 +6,6 @@ aws:
   key: "aws_key"
 chunk: 100
 database:
-  host: localhost
-  database: db
+  host: mysql:host=localhost;dbname=dbname
   username: user
   password: passwd
